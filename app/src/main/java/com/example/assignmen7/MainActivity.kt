@@ -2,6 +2,7 @@ package com.example.assignmen7
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,15 +18,20 @@ class MainActivity : AppCompatActivity() {
     private val expenseList = mutableListOf<Expense>()
     private lateinit var adapter: ExpenseAdapter
 
+    companion object {
+        private const val TAG = "MainActivity"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Log.d(TAG, "onCreate called") // Log onCreate event
 
         val nameInput = findViewById<TextInputEditText>(R.id.expenseName)
         val amountInput = findViewById<TextInputEditText>(R.id.expenseAmount)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         val addButton = findViewById<FloatingActionButton>(R.id.fab)
-        val datePicker = findViewById<TextInputEditText>(R.id.expenseDate) // ✅ Move inside onCreate()
+        val datePicker = findViewById<TextInputEditText>(R.id.expenseDate)
 
         adapter = ExpenseAdapter(expenseList) { position ->
             expenseList.removeAt(position)
@@ -62,5 +68,30 @@ class MainActivity : AppCompatActivity() {
                 datePicker.setText(selectedDate)
             }, year, month, day).show()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy called")
     }
 }
