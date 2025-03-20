@@ -15,11 +15,16 @@ import com.google.android.material.textfield.TextInputEditText
 import java.util.Calendar
 import android.net.Uri
 import android.widget.Button
+import androidx.fragment.app.Fragment
+import com.example.assignmen7.fragments.FooterFragment
+import com.example.assignmen7.fragments.HeaderFragment
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
     private val expenseList = mutableListOf<Expense>()
     private lateinit var adapter: ExpenseAdapter
+    private lateinit var footerFragment: FooterFragment
 
     companion object {
         private const val TAG = "MainActivity"
@@ -37,11 +42,24 @@ class MainActivity : AppCompatActivity() {
         val datePicker = findViewById<TextInputEditText>(R.id.expenseDate)
         val openBrowserButton = findViewById<Button>(R.id.openBrowserButton)
 
+        replaceFragment(HeaderFragment(), R.id.headerContainer)
+        footerFragment = FooterFragment()
+        replaceFragment(footerFragment, R.id.footerContainer)
+
         adapter = ExpenseAdapter(
             expenseList,
             onDelete = { position ->
+                val removedExpense = expenseList[position]
                 expenseList.removeAt(position)
                 adapter.notifyItemRemoved(position)
+                updateFooter()
+
+                Snackbar.make(recyclerView, "Expense deleted", Snackbar.LENGTH_LONG)
+                    .setAction("Undo") {
+                        expenseList.add(position, removedExpense)
+                        adapter.notifyItemInserted(position)
+                        updateFooter()
+                    }.show()
             },
             onItemClick = { selectedExpense ->
                 val intent = Intent(this, ExpenseDetailsActivity::class.java).apply {
@@ -78,6 +96,7 @@ class MainActivity : AppCompatActivity() {
             amountInput.text?.clear()
             datePicker.text?.clear()
             Toast.makeText(this, "Expense added", Toast.LENGTH_SHORT).show()
+            updateFooter()
         }
 
         datePicker.setOnClickListener {
@@ -91,6 +110,17 @@ class MainActivity : AppCompatActivity() {
                 datePicker.setText(selectedDate)
             }, year, month, day).show()
         }
+    }
+
+    private fun replaceFragment(fragment: Fragment, containerId: Int) {
+        supportFragmentManager.beginTransaction()
+            .replace(containerId, fragment)
+            .commit()
+    }
+
+    private fun updateFooter() {
+        val total = expenseList.sumOf { it.amount }
+        footerFragment.updateTotalAmount(total)
     }
 
     override fun onStart() {
