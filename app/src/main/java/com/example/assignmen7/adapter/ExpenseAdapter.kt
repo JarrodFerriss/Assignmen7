@@ -11,13 +11,25 @@ import com.example.assignmen7.model.Expense
 
 class ExpenseAdapter(
     private val expenses: MutableList<Expense>,
-    private val onDelete: (Int) -> Unit
+    private val onDelete: (Int) -> Unit,
+    private val onItemClick: (Expense) -> Unit
 ) : RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
 
-    class ExpenseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val nameTextView: TextView = view.findViewById(R.id.expenseNameTextView)
-        val amountTextView: TextView = view.findViewById(R.id.expenseAmountTextView)
-        val deleteButton: Button = view.findViewById(R.id.deleteButton)
+    inner class ExpenseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val nameTextView: TextView = view.findViewById(R.id.expenseNameTextView)
+        private val amountTextView: TextView = view.findViewById(R.id.expenseAmountTextView)
+        private val deleteButton: Button = view.findViewById(R.id.deleteButton)
+
+        fun bind(expense: Expense) {
+            nameTextView.text = expense.name
+            amountTextView.text = "$%.2f".format(expense.amount)
+
+            // Handle delete button click
+            deleteButton.setOnClickListener { onDelete(adapterPosition) }
+
+            // Handle item click to open details
+            itemView.setOnClickListener { onItemClick(expense) }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpenseViewHolder {
@@ -27,10 +39,7 @@ class ExpenseAdapter(
     }
 
     override fun onBindViewHolder(holder: ExpenseViewHolder, position: Int) {
-        val expense = expenses[position]
-        holder.nameTextView.text = expense.name
-        holder.amountTextView.text = "$%.2f".format(expense.amount)
-        holder.deleteButton.setOnClickListener { onDelete(position) }
+        holder.bind(expenses[position])
     }
 
     override fun getItemCount(): Int = expenses.size

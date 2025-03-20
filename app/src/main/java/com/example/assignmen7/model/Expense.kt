@@ -1,3 +1,3 @@
 package com.example.assignmen7.model
 
-data class Expense(val name: String, val amount: Double)
+data class Expense(val name: String, val amount: Double, val date: String)
