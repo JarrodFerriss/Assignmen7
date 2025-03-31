@@ -47,27 +47,14 @@ class ExpenseListFragment : Fragment() {
 
         adapter = ExpenseAdapter(
             expenseList,
-            onDelete = { position ->
-                val removedExpense = expenseList[position]
-                expenseList.removeAt(position)
-                adapter.notifyItemRemoved(position)
-                updateTotalAmount()
-                saveExpensesToFile()
-
-                Snackbar.make(recyclerView, "Expense deleted", Snackbar.LENGTH_LONG)
-                    .setAction("Undo") {
-                        expenseList.add(position, removedExpense)
-                        adapter.notifyItemInserted(position)
-                        updateTotalAmount()
-                        saveExpensesToFile()
-                    }.show()
-            },
-            onItemClick = { selectedExpense ->
-                val action = ExpenseListFragmentDirections.actionExpenseListFragmentToExpenseDetailsFragment(
-                    selectedExpense.name,
-                    selectedExpense.amount.toFloat(),
-                    selectedExpense.date
-                )
+            onDelete = { position -> deleteExpense(position) },
+            onItemClick = { expense ->
+                val action = ExpenseListFragmentDirections
+                    .actionExpenseListFragmentToExpenseDetailsFragment(
+                        expenseName = expense.name,
+                        expenseAmount = expense.amount.toFloat(),
+                        expenseDate = expense.date
+                    )
                 findNavController().navigate(action)
             }
         )
@@ -116,6 +103,13 @@ class ExpenseListFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun deleteExpense(position: Int) {
+        expenseList.removeAt(position)
+        adapter.notifyItemRemoved(position)
+        saveExpensesToFile()
+        updateTotalAmount()
     }
 
     private fun updateTotalAmount() {
