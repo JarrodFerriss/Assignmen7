@@ -20,8 +20,4 @@ class FooterFragment : Fragment() {
         totalAmountTextView = view.findViewById(R.id.totalAmountTextView)
         return view
     }
-
-    fun updateTotalAmount(total: Double) {
-        totalAmountTextView.text = "Total Expenses: $%.2f".format(total)
-    }
 }

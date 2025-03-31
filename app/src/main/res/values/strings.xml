@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Expense Tracker</string>
-    <string name="hint_expense_name">Enter Expense Name</string>
-    <string name="hint_expense_amount_decimal">Enter Amount</string>
+    <string name="select_date">Select Date</string>
+    <string name="financial_tips">Financial Tips</string>
     <string name="add_expense">Add Expense</string>
+    <string name="hint_expense_name">Expense Name</string>
+    <string name="hint_expense_amount_decimal">Amount</string>
 </resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/expenseListFragment">
+
+    <fragment
+        android:id="@+id/expenseListFragment"
+        android:name="com.example.assignmen7.fragments.ExpenseListFragment"
+        android:label="Expenses" >
+        <action
+            android:id="@+id/action_expenseListFragment_to_expenseDetailsFragment"
+            app:destination="@id/expenseDetailsFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/expenseDetailsFragment"
+        android:name="com.example.assignmen7.fragments.ExpenseDetailsFragment"
+        android:label="Expense Details">
+        <argument
+            android:name="expense_name"
+            app:argType="string" />
+        <argument
+            android:name="expense_amount"
+            app:argType="float" />
+        <argument
+            android:name="expense_date"
+            app:argType="string" />
+    </fragment>
+</navigation>
