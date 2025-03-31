@@ -1,24 +1,27 @@
 package com.example.assignmen7
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.assignmen7.adapter.ExpenseAdapter
-import com.example.assignmen7.model.Expense
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.textfield.TextInputEditText
-import java.util.Calendar
-import android.net.Uri
-import android.widget.Button
-import androidx.fragment.app.Fragment
 import com.example.assignmen7.fragments.FooterFragment
 import com.example.assignmen7.fragments.HeaderFragment
+import com.example.assignmen7.model.Expense
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,10 +33,33 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
     }
 
+    private val fileName = "expenses.json"
+
+    private fun saveExpensesToFile() {
+        val json = Gson().toJson(expenseList)
+        openFileOutput(fileName, Context.MODE_PRIVATE).use {
+            it.write(json.toByteArray())
+        }
+    }
+
+    private fun loadExpensesFromFile() {
+        try {
+            val json = openFileInput(fileName).bufferedReader().use { it.readText() }
+            val type = object : TypeToken<MutableList<Expense>>() {}.type
+            val loadedList: MutableList<Expense> = Gson().fromJson(json, type)
+            expenseList.clear()
+            expenseList.addAll(loadedList)
+            adapter.notifyDataSetChanged()
+            updateFooter()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading expenses: ${e.message}")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.d(TAG, "onCreate called") // Log onCreate event
+        Log.d(TAG, "onCreate called")
 
         val nameInput = findViewById<TextInputEditText>(R.id.expenseName)
         val amountInput = findViewById<TextInputEditText>(R.id.expenseAmount)
@@ -53,12 +79,14 @@ class MainActivity : AppCompatActivity() {
                 expenseList.removeAt(position)
                 adapter.notifyItemRemoved(position)
                 updateFooter()
+                saveExpensesToFile()
 
                 Snackbar.make(recyclerView, "Expense deleted", Snackbar.LENGTH_LONG)
                     .setAction("Undo") {
                         expenseList.add(position, removedExpense)
                         adapter.notifyItemInserted(position)
                         updateFooter()
+                        saveExpensesToFile()
                     }.show()
             },
             onItemClick = { selectedExpense ->
@@ -73,6 +101,8 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+
+        loadExpensesFromFile()
 
         openBrowserButton.setOnClickListener {
             val url = "https://www.financialtips.com"
@@ -92,6 +122,7 @@ class MainActivity : AppCompatActivity() {
 
             expenseList.add(Expense(name, amount, date))
             adapter.notifyItemInserted(expenseList.size - 1)
+            saveExpensesToFile()
             nameInput.text?.clear()
             amountInput.text?.clear()
             datePicker.text?.clear()
